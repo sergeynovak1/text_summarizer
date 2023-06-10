@@ -7,6 +7,10 @@ const instance = axios.create({
 
 export async function getSummurytext(num, text) {
     const response = await instance.post(`${num}`, {text});
-    console.log(response.data)
+    return response.data;
+}
+
+export async function getText(link) {
+    const response = await instance.post(`/get_link`, {link});
     return response.data;
 }

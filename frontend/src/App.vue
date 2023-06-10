@@ -5,6 +5,14 @@
     <br>
     <div className="full-width-div">
       <b-form @submit.prevent="onSubmit">
+        <b-form-group className="h4"
+                      label="Введите ссылку на статью википедии, которую нужно сократить:"
+                      label-for="input-1"
+        >
+          <b-form-input className="custom-input w-100" id="input" v-model="link"
+                           placeholder="https://ru.wikipedia.org/..."></b-form-input>
+        </b-form-group>
+        <br>
         <b-form-group className="custom-label"
                       label="Введите текст, который нужно сократить:"
                       label-for="input-1"
@@ -37,7 +45,7 @@
 </template>
 
 <script>
-import {getSummurytext} from "./services/api";
+import {getSummurytext, getText} from "./services/api";
 import TextCardView from "./components/TextCardView.vue";
 import autosize from "autosize/dist/autosize";
 
@@ -49,6 +57,7 @@ export default {
   data() {
     return {
       loading: false,
+      link: '',
       text: '',
       results_first: '',
       results_second: '',
@@ -57,6 +66,9 @@ export default {
   },
   methods: {
     async onSubmit() {
+      if (this.link) {
+        this.text = await getText(this.link)
+      }
       if (this.text) {
         this.loading = true
         this.results_first = await getSummurytext(1, this.text)

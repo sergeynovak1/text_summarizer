@@ -6,8 +6,8 @@ from rest_framework.response import Response
 
 from rest_framework.views import APIView
 
-from .serializers import MethodSerializer
-from . import frequency_analysis, cosine_distance, tf_idf
+from .serializers import MethodSerializer, LinkSerializer
+from . import frequency_analysis, cosine_distance, tf_idf, sentences
 
 
 class MethodView(APIView):
@@ -36,4 +36,27 @@ class MethodView(APIView):
                 sum_text = tf_idf.main(text)
 
             return Response(sum_text, status=status.HTTP_201_CREATED, )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LinkView(APIView):
+    permission_classes = (AllowAny, )
+    serializer_class = LinkSerializer
+    renderer_classes = (JSONRenderer,)
+
+    @swagger_auto_schema(
+        request_body=serializer_class,
+        responses={
+            201: 'Created',
+            400: 'Bad Request',
+            403: 'Forbidden'
+        }
+    )
+    def post(self, request):
+        serializer = LinkSerializer(data=request.data)
+        if serializer.is_valid():
+            link = request.data['link']
+            text = sentences.parse_wikipedia_page(link)
+
+            return Response(text, status=status.HTTP_201_CREATED, )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
